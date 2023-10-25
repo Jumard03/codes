@@ -1,0 +1,136 @@
+
+import os
+
+
+def clear_screen():
+    """Clear the screen."""
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
+def read_catalog(path):
+    catalog = {}
+    
+    try:
+        with open (path, 'r') as file:
+            for line in file:
+                line = line.strip()
+                if line:
+                    product, description, unit_price = line.split(',')
+                    catalog[product] = (description, float(unit_price))
+        return catalog
+    except FileNotFoundError:
+        print("Couldn't find the file")
+        
+def print_dictionary(d):
+    for key, value in d.items():
+        print(f"{key} - {value}")
+
+def get_user_choice(dopt, prompt):
+    clear_screen()
+    while True:  
+        print(prompt)
+        print() 
+        print_dictionary(dopt)
+        print()
+        choice = input("Your choice: ")
+        if choice in dopt:
+            return choice
+        else:
+            print("Sorry, that's not one of the options")
+
+def get_quantity():
+    while True:
+        response = input("How many would you like to buy? ")
+        try:
+            times = int(response)
+            return times
+        except ValueError:
+            print("Please, enter a whole number")
+
+def human_readable_cart(catalog, cart):
+    shopcart = {}
+    for catalog_id, quantity in cart.items():
+        description, unit_price = catalog[catalog_id]
+        subtotal = quantity * unit_price
+        human_readable_string =(f"{description} ({quantity} * {unit_price} = {subtotal})")
+        shopcart[catalog_id] = human_readable_string
+    return shopcart
+        
+def add_item_to_cart(catalog, shopcart):
+    item = get_user_choice(catalog, "Select a product to purchase: ")
+    
+    quantity = get_quantity()
+    
+    if quantity >= 0 and item in shopcart:
+        shopcart[item] += quantity
+    elif quantity == 0 and item not in shopcart:
+        quantity
+    elif quantity < 0 :
+        print("Quantity must be positive")
+    else:
+        shopcart[item] = quantity
+    
+        
+
+def change_quantity(catalog, shopcart):
+    if not shopcart:
+        print("your cart is currently empty.")
+        input("Press Enter to continue.")
+        return
+    human_read_dict = human_readable_cart(catalog, shopcart)
+    item = get_user_choice(human_read_dict, "Select the product whose quantity you want to change: ")
+    new_quantity = get_quantity()
+    if new_quantity>0:
+         shopcart[item] = new_quantity
+    else:
+        del shopcart[item]
+        
+
+def get_total(catalog, shopcart):
+    total_cost = 0
+    for item, quantity in shopcart.items():
+        description, unit_price = catalog[item]
+        total_cost += quantity * unit_price
+    return total_cost
+    
+def print_cart(catalog, shopcart):
+    clear_screen()
+    if not shopcart :
+        print("Your cart is currently empty.")
+        return
+    cart_dict = human_readable_cart(catalog, shopcart)
+    print_dictionary(cart_dict)
+    total_cost = get_total(catalog, shopcart)
+    print(f"Total cost is: $ {total_cost}")
+     
+def view_cart(catalog, shopcart):
+    print_cart(catalog, shopcart)
+    print()
+    input("Press Enter to continue")
+def check_out(catalog, shopcart):
+    print_cart(catalog, shopcart)
+    print()
+    print("Have a nice day!")
+def menu(catalog):
+    shopcart = {}
+    options = {"a": "Add an item to your cart",
+        "q": "Change the quantity of an item in your cart",
+        "v": "View your cart",
+        "c": "Check out",}
+    while True:
+        choice = get_user_choice(options, "Select an action: ")
+        if choice == "a":
+            add_item_to_cart(catalog, shopcart)
+        elif choice == "q":
+            change_quantity(catalog, shopcart)
+        elif choice == "v":
+            view_cart(catalog, shopcart)
+        elif choice == "c":
+            check_out(catalog, shopcart)
+            return 
+def main(path):
+    catalog = read_catalog(path)
+    menu(catalog)
+    
+
+if __name__ == "__main__":
+    main("catalog.csv")
