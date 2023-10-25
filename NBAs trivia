@@ -1,0 +1,96 @@
+
+import os
+
+
+def clear_screen():
+    """Clear the screen."""
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+def read_picks(path):
+    picks = {}
+    try:
+        with open(path, 'r') as file:
+            for line in file:
+                line = line.strip()
+                if line:
+                    year, player, team = line.split("|")
+                    picks[year] = (player, team)
+        return picks
+    except FileNotFoundError:
+        print("Couldn't find the file")
+
+def print_picks(p):
+    for key, value in p:
+        print(f"{key} - {value}")
+    
+           
+def game(picks):
+    score = 0
+    print("Welcome to Draft Pick Trivia!")        
+    print("1. Start Trivia")
+    print("2. Exit")
+    choice = input("Enter your choice: ")
+Instructor
+| 08/23 at 8:17 am
+Grading comment:
+Your menu only has two choices and one of them is "exit". You probably could have done without it.
+
+    if choice == "1":
+Instructor
+| 08/23 at 8:18 am
+Grading comment:
+The code below this line probably should have been in its own function. Lines 71-80 should arguably have been in yet another function.
+
+        print("Let's start the trivia!")
+        clear_screen() 
+        for year in picks:
+            player, team = picks[year]  
+            response = input(f"Who was the first overall pick in {year}? ")
+            if response == player:
+                score = score + 1
+                print("Correct")
+                print()
+                print(f"Year was: {year}")
+                print()
+                print(f"Team was: {team}")
+                print()
+                print(f"Player was: {player}")
+                print()
+                print(f"Your points: {score}")
+                print()
+                input("Press Enter")
+                clear_screen()
+                    
+            else:
+                print("Incorrect")
+                print()
+                print(f"Years was: {year}")
+                print()
+                print(f"Team was: {team}")
+                print()
+                print(f"Player was: {player}")
+                print()
+                print(f"Your points: {score}")
+                print()
+                input("Press Enter")
+                clear_screen()
+        print(f"You got a {int((score/13)*100)}%")
+        final_score = (score/13)*100
+        if final_score < 5:
+            print("You are not a fan")
+        elif final_score > 5 and final_score < 39:
+            print("You know a little something.")
+        elif final_score > 39 and final_score < 77:
+            print("You know your stuff.")
+        else:
+            print("You are a real fan")
+    elif choice == "2":
+        print("Exiting the game. Goodbye!")
+    
+def main(path):
+    picks = read_picks(path)
+    game(picks)
+
+if __name__ == "__main__":
+    main("picks.txt")
